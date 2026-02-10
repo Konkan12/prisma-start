@@ -72,6 +72,10 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
+  role   String?
+  phone  String?
+  status String? @default("ACTIVE")
+
   @@unique([email])
   @@map("user")
 }
