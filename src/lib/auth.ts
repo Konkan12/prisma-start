@@ -47,66 +47,45 @@ export const auth = betterAuth({
         autoSignIn: false,
         requireEmailVerification: true,
     },
-
-    emailVerification: {
+emailVerification: {
         sendOnSignUp: true,
-        sendVerificationEmail: async ({ user, token }) => {
+         autoSignInAfterVerification: true,
+        // এখানে সরাসরি 'url' ব্যবহার করুন যা Better Auth জেনারেট করে দেয়
+        sendVerificationEmail: async ({ user, url, token }) => {
             try {
-                const verificationUrl = `${process.env.APP_URL}/verify-email?token=${token}`;
-
                 const info = await transporter.sendMail({
-                    from: '"Prisma Blog" <prisma@gmail.com>',
+                    // আপনার .env থেকে ইমেইলটি নিন
+                    from: `"Prisma Blog" <${process.env.EMAIL_USER}>`, 
                     to: user.email,
                     subject: "Verify Your Email - Prisma Blog",
-                    text: `Please verify your email by clicking this link: ${verificationUrl}`,
+                    text: `Please verify your email by clicking this link: ${url}`,
                     html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Email Verification</title>
-            <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; margin: 0; padding: 0; }
-                .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-                .header { background-color: #4F46E5; padding: 30px; text-align: center; color: white; }
-                .content { padding: 40px 30px; text-align: center; line-height: 1.6; color: #334155; }
-                .button { display: inline-block; padding: 14px 30px; background-color: #4F46E5; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: 600; margin-top: 25px; }
-                .footer { background-color: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1 style="margin:0;">Prisma Blog</h1>
-                </div>
-                <div class="content">
-                    <h2>ইমেইল ভেরিফিকেশন</h2>
-                    <p>হ্যালো <strong>${user.name}</strong>,</p>
-                    <p>Prisma Blog-এ যোগ দেওয়ার জন্য ধন্যবাদ! আপনার অ্যাকাউন্টটি সক্রিয় করতে নিচের বাটনে ক্লিক করে আপনার ইমেইল ঠিকানাটি ভেরিফাই করুন।</p>
-                    <a href="${verificationUrl}" class="button">ভেরিফাই ইমেইল</a>
-                    <p style="margin-top: 25px; font-size: 14px;">লিঙ্কটি কাজ না করলে নিচের ইউআরএলটি কপি করে ব্রাউজারে পেস্ট করুন:<br>
-                    <span style="color: #4F46E5;">${verificationUrl}</span></p>
-                </div>
-                <div class="footer">
-                    <p>&copy; 2026 Prisma Blog. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        `
+                        <div style="font-family: sans-serif; text-align: center; padding: 20px;">
+                            <h1>ইমেইল ভেরিফিকেশন</h1>
+                            <p>হ্যালো ${user.name}, নিচে ক্লিক করে আপনার ইমেইল ভেরিফাই করুন:</p>
+                            <a href="${url}" style="background: #4F46E5; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">Verify Email</a>
+                        </div>
+                    `
                 });
 
-
-                console.log("Verification email sent:", info.messageId);
-            }catch(error){
-               console.error("Error sending verification email:", error);
-               throw error
+                console.log("Verification email sent successfully!");
+            } catch (error) {
+                console.error("Error sending email:", error);
+                // এটি থ্রো করলে Better Auth বুঝবে মেইল যায়নি
+                throw new Error("Failed to send verification email");
             }
+        },
     },
+    socialProviders: {
+        google: { 
+            prompt: "select_account consent",
+            accessType: "offline", 
+            clientId: process.env.GOOGLE_CLIENT_ID as string, 
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+            
+        }, 
     },
 
-    // Postman / local test এর জন্য
     advanced: {
         disableCSRFCheck: true,
     },
