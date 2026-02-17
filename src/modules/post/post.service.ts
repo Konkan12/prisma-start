@@ -12,9 +12,44 @@ const createPost = async (data: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'a
 }
 
 //Get All post
-const getallpost = async()=>{
-   const Allpost = await prisma.post.findMany();
-   return Allpost
+const getallpost = async (payload: {
+    scarch?: string | undefined, tags?: string[] | []
+}) => {
+   
+
+    const Allpost = await prisma.post.findMany({
+        where: {
+            AND: [
+                payload.scarch &&
+                {
+                    OR: [
+                        {
+                            title: {
+                                contains: payload.scarch as string,
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            content: {
+                                contains: payload.scarch as string,
+                                mode: "insensitive"
+                            }
+                        }, {
+                            tags: {
+                                has: payload.scarch as string
+                            }
+                        }
+                    ]
+                },
+                {
+                    tags: {
+                        hasEvery: payload.tags as string[]
+                    }
+                }
+            ]
+        }
+    });
+    return Allpost
 }
 
 export const postService = {

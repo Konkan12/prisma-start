@@ -20,8 +20,10 @@ const createPost = async (req: Request, res: Response) => {
 }
 const getAllpost = async(req:Request,res:Response)=>{
     try{
-
-  const result = await postService.getallpost()
+  const {scarch} = req.query
+   const scarchString = typeof scarch === "string" ? scarch : undefined;
+   const tags = req.query.tags ? ( req.query.tags as string).split(","):[]
+const result = await postService.getallpost({ scarch:scarchString })
   res.status(200).json(result)
     }catch(err){
         res.status(500).json({
