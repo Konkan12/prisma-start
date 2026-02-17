@@ -18,7 +18,19 @@ const createPost = async (req: Request, res: Response) => {
         })
     }
 }
+const getAllpost = async(req:Request,res:Response)=>{
+    try{
 
+  const result = await postService.getallpost()
+  res.status(200).json(result)
+    }catch(err){
+        res.status(500).json({
+            error: "Failed to retrieve posts",
+            details: err
+        })
+    }
+}
 export const postController  = {
-    createPost
+    createPost,
+    getAllpost
 }

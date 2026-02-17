@@ -5,7 +5,9 @@ import auth, { userRole } from "../../middleauare/auth"
 
 const router = express.Router()
 
-
+router.get("/",
+   postController.getAllpost 
+)
 
 router.post("/",auth(userRole.user),postController.createPost)
  
