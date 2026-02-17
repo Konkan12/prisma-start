@@ -23,7 +23,7 @@ const getAllpost = async(req:Request,res:Response)=>{
   const {scarch} = req.query
    const scarchString = typeof scarch === "string" ? scarch : undefined;
    const tags = req.query.tags ? ( req.query.tags as string).split(","):[]
-const result = await postService.getallpost({ scarch:scarchString })
+const result = await postService.getallpost({ scarch:scarchString, tags })
   res.status(200).json(result)
     }catch(err){
         res.status(500).json({
